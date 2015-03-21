@@ -1,0 +1,16 @@
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+	<display-name>chatt</display-name>
+	<servlet>
+		<servlet-name>LoginServlet</servlet-name>
+		<servlet-class>chat.LoginServlet</servlet-class>
+	</servlet>
+	<welcome-file-list>
+		<welcome-file>chat.html</welcome-file>
+	</welcome-file-list>
+	<servlet-mapping>
+		<servlet-name>LoginServlet</servlet-name>
+		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+</web-app>
