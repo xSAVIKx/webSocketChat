@@ -5,6 +5,8 @@ bin/**
 *.ear
 *.class
 
+home/
+
 *.pydevproject
 .metadata
 .gradle
