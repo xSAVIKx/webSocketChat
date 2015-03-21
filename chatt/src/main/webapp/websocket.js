@@ -12,11 +12,16 @@ function onMessageReceived(evt) {
 		leaveRoom('some error occured');
 	} else {
 		var msg = JSON.parse(evt.data); // native API
-		var $messageLine = $('<tr><td class="col-sm-2">' + msg.timestamp
-				+ '</td><td class="user label label-info">' + msg.sender
-				+ '</td><td class="message badge">' + msg.argumentValue
-				+ '</td></tr>');
+		var timestamp = '<div class="label label-default">' + msg.timestamp
+				+ '</div>';
+		var sender = '<div class="user label label-info">' + msg.sender
+				+ '</div>';
+		var message = '<div class="message badge">' + msg.argumentValue
+				+ '</div>';
+		var $messageLine = '<div class="row">' + timestamp + sender + message
+				+ '</div>';
 		$chatWindow.append($messageLine);
+		$chatWindow.scrollTop($chatWindow.prop('scrollHeight'));
 	}
 }
 function getLoginCommand(userName) {
