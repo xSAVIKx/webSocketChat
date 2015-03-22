@@ -6,7 +6,7 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-import chat.CommandPojo;
+import chat.model.CommandPojo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

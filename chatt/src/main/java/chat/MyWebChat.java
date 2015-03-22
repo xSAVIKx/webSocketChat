@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import chat.coder.CommandPojoDecoder;
 import chat.coder.CommandPojoEncoder;
+import chat.model.Command;
+import chat.model.CommandPojo;
 
 @ServerEndpoint(value = "/chat", encoders = CommandPojoEncoder.class, decoders = CommandPojoDecoder.class)
 public class MyWebChat {
@@ -43,23 +45,31 @@ public class MyWebChat {
 		switch (command.getCommand()) {
 		case LOGIN:
 			sender = command.getArgumentValue();
+			command.setSender("SYSTEM");
 			if (hasSuchSender(sender)) {
 				returnCode = "ERROR";
-			} else {
+			} else if (StringUtils.isNotBlank(sender)) {
 				setSender(session, sender);
+				sendMessage(session, command);
 				returnCode = "OK";
+			} else {
+				returnCode = "ERROR";
 			}
 			break;
 		case LOGOUT:
 			sender = command.getArgumentValue();
-			if (hasSuchSender(session, sender))
+			command.setSender("SYSTEM");
+			if (StringUtils.isNotBlank(sender)
+					&& hasSuchSender(session, sender)) {
+				setSender(session, sender);
+				sendMessage(session, command);
 				returnCode = "OK";
-			else {
+			} else {
 				returnCode = "ERROR";
 			}
 			break;
 		case SEND_MESSAGE:
-			returnCode = sendMessage(command);
+			returnCode = sendMessage(session, command);
 			break;
 		case NO_COMMAND:
 			break;
@@ -98,11 +108,19 @@ public class MyWebChat {
 		return username;
 	}
 
-	private String sendMessage(CommandPojo message) {
+	private String sendMessage(Session user, CommandPojo message) {
 		for (Session peer : peers) {
 			if (peer.isOpen()) {
 				try {
-					peer.getBasicRemote().sendObject(message);
+					if (peer.equals(user)
+							&& (!message.getCommand().equals(Command.LOGIN) || !message
+									.getCommand().equals(Command.LOGIN))) {
+						CommandPojo selfMessage = new CommandPojo(message);
+						selfMessage.setSender("You");
+						peer.getBasicRemote().sendObject(selfMessage);
+					} else {
+						peer.getBasicRemote().sendObject(message);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 					return "ERROR";

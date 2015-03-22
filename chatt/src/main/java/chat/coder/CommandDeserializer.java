@@ -2,7 +2,7 @@ package chat.coder;
 
 import java.io.IOException;
 
-import chat.Command;
+import chat.model.Command;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -7,8 +7,8 @@ import javax.websocket.EncodeException;
 import org.junit.Before;
 import org.junit.Test;
 
-import chat.Command;
-import chat.CommandPojo;
+import chat.model.Command;
+import chat.model.CommandPojo;
 
 public class CommandPojoEncoderTest {
 	private CommandPojoEncoder encoder;

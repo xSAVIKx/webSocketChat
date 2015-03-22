@@ -7,8 +7,8 @@ import javax.websocket.DecodeException;
 import org.junit.Before;
 import org.junit.Test;
 
-import chat.Command;
-import chat.CommandPojo;
+import chat.model.Command;
+import chat.model.CommandPojo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -12,17 +12,51 @@ function onMessageReceived(evt) {
 		leaveRoom('some error occured');
 	} else {
 		var msg = JSON.parse(evt.data); // native API
-		var timestamp = '<div class="label label-default">' + msg.timestamp
-				+ '</div>';
-		var sender = '<div class="user label label-info">' + msg.sender
-				+ '</div>';
-		var message = '<div class="message badge">' + msg.argumentValue
-				+ '</div>';
-		var $messageLine = '<div class="row">' + timestamp + sender + message
-				+ '</div>';
-		$chatWindow.append($messageLine);
-		$chatWindow.scrollTop($chatWindow.prop('scrollHeight'));
+		processCommand(msg);
 	}
+}
+function processCommand(command) {
+	var commandName = command.command.name;
+	switch (commandName) {
+	case "LOGIN":
+		processLoginCommand(command);
+		break;
+	case "LOGOUT":
+		processLogoutCommand(command)
+		break;
+	case "SEND_MESSAGE":
+		processSendMessageCommand(command);
+		break;
+	default:
+		break;
+	}
+}
+function processSendMessageCommand(command) {
+	var $messageLine = generateMessageLine(command.timestamp, command.sender,
+			command.argumentValue);
+	writeMessage($messageLine);
+}
+function processLoginCommand(command) {
+	var $messageLine = generateMessageLine(command.timestamp, command.sender,
+			'User "' + command.argumentValue + '" has logged in.');
+	writeMessage($messageLine);
+}
+function processLogoutCommand(command) {
+	var $messageLine = generateMessageLine(command.timestamp, command.sender,
+			'User "' + command.argumentValue + '" has logged out.');
+	writeMessage($messageLine);
+}
+function writeMessage(messageLine) {
+	$chatWindow.append(messageLine);
+	$chatWindow.scrollTop($chatWindow.prop('scrollHeight'));
+}
+function generateMessageLine(timestamp, sender, messageValue) {
+	var timestamp = '<div class="label label-default">' + timestamp + '</div>';
+	var sender = '<div class="user label label-info">' + sender + '</div>';
+	var message = '<div class="message badge">' + messageValue + '</div>';
+	var $messageLine = '<div class="row">' + timestamp + sender + message
+			+ '</div>';
+	return $messageLine;
 }
 function getLoginCommand(userName) {
 	var loginCommand = '{"command":{"name":"LOGIN"},"argumentValue":"'
@@ -34,7 +68,7 @@ function getMessageCommand(message) {
 			+ $message.val() + '"}';
 	return msg;
 }
-function getLogoutCommand(username) {
+function getLogoutCommand(userName) {
 	var logoutCommand = '{"command":{"name":"LOGOUT"},"argumentValue":"'
 			+ userName + '"}';
 	return logoutCommand;
@@ -51,15 +85,13 @@ function connectToChatserver() {
 	wsocket.onopen = function() {
 		wsocket.send(getLoginCommand($nickName.val()));
 	}
-	wsocket.onclose = function() {
-		wsocket.send(getLogoutCommand($nickName.val()));
-	}
 }
 
 function leaveRoom(error) {
 	if (error != '') {
 		alert(error);
 	}
+	wsocket.send(getLogoutCommand($nickName.val()));
 	wsocket.close();
 	$chatWindow.empty();
 	$('.chat-wrapper').hide();
