@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import chat.model.Command;
-import chat.model.CommandPojo;
+import chat.spring.model.CommandPojo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

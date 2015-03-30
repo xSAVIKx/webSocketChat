@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import chat.model.Command;
-import chat.model.CommandPojo;
+import chat.spring.model.CommandPojo;
 
 public class CommandPojoEncoderTest {
 	private CommandPojoEncoder encoder;

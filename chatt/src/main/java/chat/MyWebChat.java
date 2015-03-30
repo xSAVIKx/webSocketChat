@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import chat.coder.CommandPojoDecoder;
 import chat.coder.CommandPojoEncoder;
 import chat.model.Command;
-import chat.model.CommandPojo;
+import chat.spring.model.CommandPojo;
 
 @ServerEndpoint(value = "/chat", encoders = CommandPojoEncoder.class, decoders = CommandPojoDecoder.class)
 public class MyWebChat {
