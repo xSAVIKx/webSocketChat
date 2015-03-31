@@ -26,7 +26,6 @@ import chat.spring.model.CommandPojo;
 @ContextConfiguration(classes = { ApplicationConfig.class,
 		HibernateConfiguration.class })
 public class CommandServiceTest {
-	static AbstractApplicationContext context;
 	@Autowired
 	CommandService commandService;
 	@Autowired
@@ -34,13 +33,6 @@ public class CommandServiceTest {
 
 	CommandPojo commandPojo;
 	CommandPojo savedPojo;
-
-	@BeforeClass
-	public static void setUpClass() {
-		context = new AnnotationConfigApplicationContext(
-				ApplicationConfig.class);
-
-	}
 
 	@Before
 	public void setUp() throws Exception {

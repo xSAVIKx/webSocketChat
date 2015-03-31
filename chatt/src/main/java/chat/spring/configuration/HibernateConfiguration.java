@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "chat.spring.configuration" })
+@ComponentScan({ "chat" })
 @PropertySource(value = { "classpath:application.properties" })
 public class HibernateConfiguration {
 	@Autowired
@@ -34,7 +34,7 @@ public class HibernateConfiguration {
 		vendorAdapter.setGenerateDdl(true);
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter(vendorAdapter);
-		factory.setPackagesToScan("chat.spring");
+		factory.setPackagesToScan("chat");
 		factory.setDataSource(dataSource());
 		factory.setJpaProperties(hibernateProperties());
 		factory.afterPropertiesSet();
@@ -46,7 +46,7 @@ public class HibernateConfiguration {
 	public LocalSessionFactoryBean sessionFactory() {
 		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource());
-		sessionFactory.setPackagesToScan(new String[] { "chat.spring" });
+		sessionFactory.setPackagesToScan(new String[] { "chat" });
 		sessionFactory.setHibernateProperties(hibernateProperties());
 		return sessionFactory;
 	}

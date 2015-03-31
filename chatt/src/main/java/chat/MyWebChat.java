@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.websocket.EncodeException;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -19,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import chat.coder.CommandPojoDecoder;
 import chat.coder.CommandPojoEncoder;
 import chat.model.Command;
+import chat.spring.configuration.ApplicationContextProvider;
 import chat.spring.model.CommandPojo;
+import chat.spring.service.CommandService;
 
 @ServerEndpoint(value = "/chat", encoders = CommandPojoEncoder.class, decoders = CommandPojoDecoder.class)
 public class MyWebChat {
@@ -32,10 +35,10 @@ public class MyWebChat {
 
 	private static Set<Session> peers = SetUtils
 			.synchronizedSet(new HashSet<Session>());
+	private CommandService commandService;
 
 	@OnMessage
 	public String onMessage(Session session, CommandPojo command) {
-
 		if (logger.isDebugEnabled()) {
 			logger.debug("onMessage(String) - start");
 		}
@@ -113,8 +116,7 @@ public class MyWebChat {
 			if (peer.isOpen()) {
 				try {
 					if (peer.equals(user)
-							&& (!message.getCommand().equals(Command.LOGIN) || !message
-									.getCommand().equals(Command.LOGIN))) {
+							&& isNotLoginAndLogoutCommand(message.getCommand())) {
 						CommandPojo selfMessage = new CommandPojo(message);
 						selfMessage.setSender("You");
 						peer.getBasicRemote().sendObject(selfMessage);
@@ -129,11 +131,32 @@ public class MyWebChat {
 				}
 			}
 		}
+		saveCommandInSeparateThread(message);
 		return "OK";
 	}
 
+	private boolean isNotLoginAndLogoutCommand(Command command) {
+		return !Command.LOGIN.equals(command)
+				&& !Command.LOGOUT.equals(command);
+	}
+
+	private void saveCommandInSeparateThread(final CommandPojo command) {
+		if (logger.isInfoEnabled()) {
+			logger.info(
+					"saveCommandInSeparateThread(CommandPojo) - CommandPojo command={}",
+					command);
+		}
+		Thread thread = new Thread(command.getSender() + command.getTimestamp()) {
+			public void run() {
+				getCommandService().saveCommand(command);
+			};
+		};
+		thread.start();
+	}
+
 	@OnOpen
-	public void onOpen(Session peer) {
+	public void onOpen(Session peer, EndpointConfig config) {
+		//TODO save HTTP sessions to get users IP addresses. try to check this page: http://stackoverflow.com/questions/17936440/accessing-httpsession-from-httpservletrequest-in-a-web-socket-socketendpoint/17994303#17994303
 		synchronized (peers) {
 			peers.add(peer);
 		}
@@ -144,5 +167,13 @@ public class MyWebChat {
 		synchronized (peers) {
 			peers.remove(peer);
 		}
+	}
+
+	private CommandService getCommandService() {
+		if (commandService == null) {
+			commandService = ApplicationContextProvider.getApplicationContext()
+					.getBean(CommandService.class);
+		}
+		return commandService;
 	}
 }
