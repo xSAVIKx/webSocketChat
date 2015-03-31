@@ -7,3 +7,5 @@ Technologies:
 * JavaEE7
 * Glassfish WebSockets
 * JS - jQuery
+* Spring 4
+* Hibernate 4
