@@ -1,4 +1,5 @@
 var wsocket;
+var dateTimeFormat = "YYYY-MM-DD HH:mm:ss";
 var serviceLocation = "ws://" + document.location.host
 		+ document.location.pathname + "chat";
 var $nickName;
@@ -16,20 +17,34 @@ function onMessageReceived(evt) {
 	}
 }
 function processCommand(command) {
-	var commandName = command.command.name;
-	switch (commandName) {
-	case "LOGIN":
-		processLoginCommand(command);
-		break;
-	case "LOGOUT":
-		processLogoutCommand(command)
-		break;
-	case "SEND_MESSAGE":
-		processSendMessageCommand(command);
-		break;
-	default:
-		break;
+	if (command.constructor === Array) {
+		processLoadHistoryCommand(command);
+	} else {
+		var commandName = command.command.name;
+		switch (commandName) {
+		case "LOGIN":
+			processLoginCommand(command);
+			break;
+		case "LOGOUT":
+			processLogoutCommand(command)
+			break;
+		case "SEND_MESSAGE":
+			processSendMessageCommand(command);
+			break;
+		default:
+			break;
+		}
 	}
+}
+function processLoadHistoryCommand(commands) {
+	var newWindow = window.open();
+	newWindow.document.open();
+	commands.forEach(function(command) {
+		var message = generateHistoryMessageLine(command.timestamp,
+				command.sender, command.argumentValue);
+		newWindow.document.write(message);
+	});
+	newWindow.document.close();
 }
 function processSendMessageCommand(command) {
 	var $messageLine = generateMessageLine(command.timestamp, command.sender,
@@ -50,6 +65,11 @@ function writeMessage(messageLine) {
 	$chatWindow.append(messageLine);
 	$chatWindow.scrollTop($chatWindow.prop('scrollHeight'));
 }
+function generateHistoryMessageLine(timestamp, sender, messageValue) {
+	var $messageLine = timestamp + ' ' + sender + ' : ' + messageValue
+			+ '<br/>';
+	return $messageLine;
+}
 function generateMessageLine(timestamp, sender, messageValue) {
 	var timestamp = '<div class="label label-default">' + timestamp + '</div>';
 	var sender = '<div class="user label label-info">' + sender + '</div>';
@@ -67,6 +87,12 @@ function getMessageCommand(message) {
 	var msg = '{"command":{"name":"SEND_MESSAGE"},"argumentValue":"'
 			+ $message.val() + '"}';
 	return msg;
+}
+function getLoadHistoryCommand() {
+	var msg = '{"command":{"name":"LOAD_HISTORY"},"argumentValue":"'
+			+ moment().startOf('day').hours(0).startOf('hour') + '"}';
+	return msg;
+
 }
 function getLogoutCommand(userName) {
 	var logoutCommand = '{"command":{"name":"LOGOUT"},"argumentValue":"'
@@ -99,6 +125,10 @@ function leaveRoom(error) {
 	$nickName.focus();
 }
 
+function loadHistory() {
+	wsocket.send(getLoadHistoryCommand());
+}
+
 $(document).ready(function() {
 	$nickName = $('#nickname');
 	$message = $('#message');
@@ -121,5 +151,8 @@ $(document).ready(function() {
 
 	$('#leave-room').click(function() {
 		leaveRoom('');
+	});
+	$('#load-history').click(function() {
+		loadHistory();
 	});
 });

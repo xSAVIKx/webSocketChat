@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -14,9 +13,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
 import chat.model.Command;
+import chat.model.Constants;
 
 @Entity
 @Table(name = "MESSAGE")
@@ -36,8 +35,7 @@ public class CommandPojo {
 	private String timestamp;
 
 	public CommandPojo() {
-
-		timestamp = DateTime.now().toString(DateTimeFormat.mediumDateTime());
+		timestamp = DateTime.now().toString(Constants.DATE_TIME_FORMATTER);
 	}
 
 	public CommandPojo(CommandPojo commandPojo) {

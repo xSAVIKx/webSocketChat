@@ -4,15 +4,13 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -64,10 +62,38 @@ public class CommandServiceTest {
 
 	@Test
 	public void testGetAllCommands() {
+		List<CommandPojo> pojoFromDBBeforeInsert = commandService
+				.getAllCommands();
 		savedPojo = commandService.saveCommand(commandPojo);
 
 		List<CommandPojo> pojoFromDB = commandService.getAllCommands();
-		Assert.assertEquals(1, pojoFromDB.size());
+		Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1,
+				pojoFromDB.size());
+		Assert.assertEquals(pojoFromDB.get(pojoFromDBBeforeInsert.size()),
+				savedPojo);
+	}
+
+	@Test
+	public void testGetCommandsFilteredByDateReturnEmptyCollection() {
+		List<CommandPojo> pojoFromDBBeforeInsert = commandService
+				.getCommandsFilteredByDate(DateTime.now().minusDays(5));
+		savedPojo = commandService.saveCommand(commandPojo);
+
+		List<CommandPojo> pojoFromDB = commandService
+				.getCommandsFilteredByDate(DateTime.now().minusDays(5));
+		Assert.assertEquals(pojoFromDBBeforeInsert.size(), pojoFromDB.size());
+	}
+
+	@Test
+	public void testGetCommandsFilteredByDate() {
+		List<CommandPojo> pojoFromDBBeforeInsert = commandService
+				.getCommandsFilteredByDate(DateTime.now().plusDays(5));
+		savedPojo = commandService.saveCommand(commandPojo);
+
+		List<CommandPojo> pojoFromDB = commandService
+				.getCommandsFilteredByDate(DateTime.now().plusDays(5));
+		Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1,
+				pojoFromDB.size());
 		Assert.assertEquals(pojoFromDB.get(0), savedPojo);
 	}
 

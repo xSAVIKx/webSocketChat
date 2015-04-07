@@ -1,17 +1,13 @@
 package chat.coder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import javax.websocket.DecodeException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import chat.model.Command;
 import chat.spring.model.CommandPojo;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CommandPojoDecoderTest {
 	private CommandPojoDecoder decoder;

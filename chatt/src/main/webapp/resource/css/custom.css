@@ -48,3 +48,7 @@ body {
 	max-height: 250px;
 	min-height: 250px;
 }
+
+.response div[class="row"] {
+	margin-left: 20px;
+}

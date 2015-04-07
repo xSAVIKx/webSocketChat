@@ -2,6 +2,8 @@ package chat.spring.service;
 
 import java.util.List;
 
+import org.joda.time.DateTime;
+
 import chat.spring.model.CommandPojo;
 
 public interface CommandService {
@@ -11,4 +13,5 @@ public interface CommandService {
 
 	List<CommandPojo> getAllCommands();
 
+	List<CommandPojo> getCommandsFilteredByDate(DateTime fromDate);
 }

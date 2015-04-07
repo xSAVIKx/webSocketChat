@@ -2,6 +2,7 @@ package chat;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.websocket.EncodeException;
@@ -14,17 +15,20 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import chat.coder.CommandPojoDecoder;
 import chat.coder.CommandPojoEncoder;
+import chat.coder.ListCommandPojoEncoder;
 import chat.model.Command;
 import chat.spring.configuration.ApplicationContextProvider;
 import chat.spring.model.CommandPojo;
 import chat.spring.service.CommandService;
 
-@ServerEndpoint(value = "/chat", encoders = CommandPojoEncoder.class, decoders = CommandPojoDecoder.class)
+@ServerEndpoint(value = "/chat", encoders = { CommandPojoEncoder.class,
+		ListCommandPojoEncoder.class }, decoders = CommandPojoDecoder.class)
 public class MyWebChat {
 	/**
 	 * Logger for this class
@@ -73,6 +77,20 @@ public class MyWebChat {
 			break;
 		case SEND_MESSAGE:
 			returnCode = sendMessage(session, command);
+			break;
+		case LOAD_HISTORY:
+			String fromDateString = command.getArgumentValue();
+			DateTime fromDate = new DateTime(Long.valueOf(fromDateString));
+			List<CommandPojo> commands = getCommandService()
+					.getCommandsFilteredByDate(fromDate);
+			try {
+				session.getBasicRemote().sendObject(commands);
+				returnCode = "OK";
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (EncodeException e) {
+				e.printStackTrace();
+			}
 			break;
 		case NO_COMMAND:
 			break;
@@ -156,7 +174,9 @@ public class MyWebChat {
 
 	@OnOpen
 	public void onOpen(Session peer, EndpointConfig config) {
-		//TODO save HTTP sessions to get users IP addresses. try to check this page: http://stackoverflow.com/questions/17936440/accessing-httpsession-from-httpservletrequest-in-a-web-socket-socketendpoint/17994303#17994303
+		// TODO save HTTP sessions to get users IP addresses. try to check this
+		// page:
+		// http://stackoverflow.com/questions/17936440/accessing-httpsession-from-httpservletrequest-in-a-web-socket-socketendpoint/17994303#17994303
 		synchronized (peers) {
 			peers.add(peer);
 		}

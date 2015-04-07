@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonDeserialize(using = CommandDeserializer.class)
 public enum Command {
 	SEND_MESSAGE("message"), LOGIN("username"), LOGOUT("username"), NO_COMMAND(
-			"");
+			""), LOAD_HISTORY("date_from");
 	private String argumentName;
 
 	Command(String argumetName) {
