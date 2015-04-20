@@ -141,6 +141,8 @@
 	</dependencies>
 	<build>
 		<finalName>chatt</finalName>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>test/main/java</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
