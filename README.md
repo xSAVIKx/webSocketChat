@@ -9,3 +9,5 @@ Technologies:
 * JS - jQuery
 * Spring 4
 * Hibernate 4
+* maven
+* jUnit
