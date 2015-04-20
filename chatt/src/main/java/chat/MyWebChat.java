@@ -21,14 +21,16 @@ import org.slf4j.LoggerFactory;
 
 import chat.coder.CommandPojoDecoder;
 import chat.coder.CommandPojoEncoder;
+import chat.coder.ListCommandPojoDecoder;
 import chat.coder.ListCommandPojoEncoder;
 import chat.model.Command;
+import chat.model.Constants;
 import chat.spring.configuration.ApplicationContextProvider;
 import chat.spring.model.CommandPojo;
 import chat.spring.service.CommandService;
 
 @ServerEndpoint(value = "/chat", encoders = { CommandPojoEncoder.class,
-		ListCommandPojoEncoder.class }, decoders = CommandPojoDecoder.class)
+		ListCommandPojoEncoder.class }, decoders = {CommandPojoDecoder.class, ListCommandPojoDecoder.class})
 public class MyWebChat {
 	/**
 	 * Logger for this class
@@ -46,21 +48,19 @@ public class MyWebChat {
 		if (logger.isDebugEnabled()) {
 			logger.debug("onMessage(String) - start");
 		}
-		String returnCode = "ERROR";
+		String returnCode = Constants.COMMAND_STATUS_ERROR;
 		String sender = getSender(session);
 		command.setSender(sender);
 		switch (command.getCommand()) {
 		case LOGIN:
 			sender = command.getArgumentValue();
 			command.setSender("SYSTEM");
-			if (hasSuchSender(sender)) {
-				returnCode = "ERROR";
-			} else if (StringUtils.isNotBlank(sender)) {
+			if (StringUtils.isNotBlank(sender) && !hasSuchSender(sender)) {
 				setSender(session, sender);
 				sendMessage(session, command);
-				returnCode = "OK";
+				returnCode = Command.getLoginStatusOKCommand(sender);
 			} else {
-				returnCode = "ERROR";
+				returnCode = Command.getLoginStatusErrorCommand(sender);
 			}
 			break;
 		case LOGOUT:
@@ -70,9 +70,7 @@ public class MyWebChat {
 					&& hasSuchSender(session, sender)) {
 				setSender(session, sender);
 				sendMessage(session, command);
-				returnCode = "OK";
-			} else {
-				returnCode = "ERROR";
+				returnCode = Constants.COMMAND_STATUS_OK;
 			}
 			break;
 		case SEND_MESSAGE:
@@ -85,7 +83,7 @@ public class MyWebChat {
 					.getCommandsFilteredByDate(fromDate);
 			try {
 				session.getBasicRemote().sendObject(commands);
-				returnCode = "OK";
+				returnCode = Constants.COMMAND_STATUS_OK;
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (EncodeException e) {
@@ -132,25 +130,32 @@ public class MyWebChat {
 	private String sendMessage(Session user, CommandPojo message) {
 		for (Session peer : peers) {
 			if (peer.isOpen()) {
-				try {
-					if (peer.equals(user)
-							&& isNotLoginAndLogoutCommand(message.getCommand())) {
-						CommandPojo selfMessage = new CommandPojo(message);
-						selfMessage.setSender("You");
+
+				if (peer.equals(user)
+						&& isNotLoginAndLogoutCommand(message.getCommand())) {
+					CommandPojo selfMessage = new CommandPojo(message);
+					selfMessage.setSender("You");
+					try {
 						peer.getBasicRemote().sendObject(selfMessage);
-					} else {
-						peer.getBasicRemote().sendObject(message);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (EncodeException e) {
+						e.printStackTrace();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					return "ERROR";
-				} catch (EncodeException e) {
-					e.printStackTrace();
+				} else {
+					try {
+						peer.getBasicRemote().sendObject(message);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (EncodeException e) {
+						e.printStackTrace();
+					}
 				}
+
 			}
 		}
 		saveCommandInSeparateThread(message);
-		return "OK";
+		return Constants.COMMAND_STATUS_OK;
 	}
 
 	private boolean isNotLoginAndLogoutCommand(Command command) {

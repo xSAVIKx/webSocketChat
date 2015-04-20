@@ -2,14 +2,16 @@ var wsocket;
 var dateTimeFormat = "YYYY-MM-DD HH:mm:ss";
 var serviceLocation = "ws://" + document.location.host
 		+ document.location.pathname + "chat";
+var COMMAND_STATUS_OK = 'true'
+var COMMAND_STATUS_ERROR = 'false'
 var $nickName;
 var $message;
 var $chatWindow;
 
 function onMessageReceived(evt) {
-	if (evt.data == 'OK') {
+	if (evt.data == COMMAND_STATUS_OK) {
 
-	} else if (evt.data == 'ERROR') {
+	} else if (evt.data == COMMAND_STATUS_ERROR) {
 		leaveRoom('some error occured');
 	} else {
 		var msg = JSON.parse(evt.data); // native API
