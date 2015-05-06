@@ -21,80 +21,73 @@ import chat.spring.db.CommandRepository;
 import chat.spring.model.CommandPojo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { ApplicationConfig.class,
-		HibernateConfiguration.class })
+@ContextConfiguration(classes = {
+    ApplicationConfig.class, HibernateConfiguration.class
+})
 public class CommandServiceTest {
-	@Autowired
-	CommandService commandService;
-	@Autowired
-	CommandRepository commandRepository;
+  @Autowired
+  CommandService commandService;
+  @Autowired
+  CommandRepository commandRepository;
 
-	CommandPojo commandPojo;
-	CommandPojo savedPojo;
+  CommandPojo commandPojo;
+  CommandPojo savedPojo;
 
-	@Before
-	public void setUp() throws Exception {
-		commandPojo = new CommandPojo();
-		commandPojo.setArgumentValue("test");
-		commandPojo.setCommand(Command.SEND_MESSAGE);
-		commandPojo.setSender("sender");
-	}
+  @Before
+  public void setUp() throws Exception {
+    commandPojo = new CommandPojo();
+    commandPojo.setArgumentValue("test");
+    commandPojo.setCommand(Command.SEND_MESSAGE);
+    commandPojo.setSender("sender");
+  }
 
-	@After
-	public void tearDown() throws Exception {
-		if (savedPojo != null)
-			try {
-				commandRepository.delete(savedPojo);
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-	}
+  @After
+  public void tearDown() throws Exception {
+    if (savedPojo != null)
+      try {
+        commandRepository.delete(savedPojo);
+      } catch (Exception e) {
+        // TODO: handle exception
+      }
+  }
 
-	@Test
-	@Transactional
-	public void testSaveCommand() {
-		savedPojo = commandService.saveCommand(commandPojo);
-		long id = savedPojo.getId();
+  @Test
+  @Transactional
+  public void testSaveCommand() {
+    savedPojo = commandService.saveCommand(commandPojo);
+    long id = savedPojo.getId();
 
-		CommandPojo pojoFromDB = commandService.findCommandById(id);
-		Assert.assertEquals(pojoFromDB, savedPojo);
-	}
+    CommandPojo pojoFromDB = commandService.findCommandById(id);
+    Assert.assertEquals(pojoFromDB, savedPojo);
+  }
 
-	@Test
-	public void testGetAllCommands() {
-		List<CommandPojo> pojoFromDBBeforeInsert = commandService
-				.getAllCommands();
-		savedPojo = commandService.saveCommand(commandPojo);
+  @Test
+  public void testGetAllCommands() {
+    List<CommandPojo> pojoFromDBBeforeInsert = commandService.getAllCommands();
+    savedPojo = commandService.saveCommand(commandPojo);
 
-		List<CommandPojo> pojoFromDB = commandService.getAllCommands();
-		Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1,
-				pojoFromDB.size());
-		Assert.assertEquals(pojoFromDB.get(pojoFromDBBeforeInsert.size()),
-				savedPojo);
-	}
+    List<CommandPojo> pojoFromDB = commandService.getAllCommands();
+    Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1, pojoFromDB.size());
+    Assert.assertEquals(pojoFromDB.get(pojoFromDBBeforeInsert.size()), savedPojo);
+  }
 
-	@Test
-	public void testGetCommandsFilteredByDateReturnEmptyCollection() {
-		List<CommandPojo> pojoFromDBBeforeInsert = commandService
-				.getCommandsFilteredByDate(DateTime.now().minusDays(5));
-		savedPojo = commandService.saveCommand(commandPojo);
+  @Test
+  public void testGetCommandsFilteredByDateReturnEmptyCollection() {
+    List<CommandPojo> pojoFromDBBeforeInsert = commandService.getCommandsFilteredByDate(DateTime.now().minusDays(5));
+    savedPojo = commandService.saveCommand(commandPojo);
 
-		List<CommandPojo> pojoFromDB = commandService
-				.getCommandsFilteredByDate(DateTime.now().minusDays(5));
-		Assert.assertEquals(pojoFromDBBeforeInsert.size(), pojoFromDB.size());
-	}
+    List<CommandPojo> pojoFromDB = commandService.getCommandsFilteredByDate(DateTime.now().minusDays(5));
+    Assert.assertEquals(pojoFromDBBeforeInsert.size(), pojoFromDB.size());
+  }
 
-	@Test
-	public void testGetCommandsFilteredByDate() {
-		List<CommandPojo> pojoFromDBBeforeInsert = commandService
-				.getCommandsFilteredByDate(DateTime.now().plusDays(5));
-		savedPojo = commandService.saveCommand(commandPojo);
+  @Test
+  public void testGetCommandsFilteredByDate() {
+    List<CommandPojo> pojoFromDBBeforeInsert = commandService.getCommandsFilteredByDate(DateTime.now().plusDays(5));
+    savedPojo = commandService.saveCommand(commandPojo);
 
-		List<CommandPojo> pojoFromDB = commandService
-				.getCommandsFilteredByDate(DateTime.now().plusDays(5));
-		Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1,
-				pojoFromDB.size());
-		Assert.assertEquals(pojoFromDB.get(0), savedPojo);
-	}
+    List<CommandPojo> pojoFromDB = commandService.getCommandsFilteredByDate(DateTime.now().plusDays(5));
+    Assert.assertEquals(pojoFromDBBeforeInsert.size() + 1, pojoFromDB.size());
+    Assert.assertEquals(pojoFromDB.get(0), savedPojo);
+  }
 
 }

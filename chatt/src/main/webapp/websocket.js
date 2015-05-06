@@ -2,16 +2,31 @@ var wsocket;
 var dateTimeFormat = "YYYY-MM-DD HH:mm:ss";
 var serviceLocation = "ws://" + document.location.host
 		+ document.location.pathname + "chat";
-var COMMAND_STATUS_OK = 'true'
-var COMMAND_STATUS_ERROR = 'false'
+var COMMAND_STATUS = {
+	OK : {
+		value : 'true',
+		text : 'COMMAND STATUS OK'
+	},
+	ERROR : {
+		value : 'false',
+		text : 'COMMAND STATUS ERROR'
+	}
+}
+var COMMAND = {
+	LOGIN_STATUS_OK : 'LOGIN_STATUS_OK',
+	LOGIN_STATUS_ERROR : 'LOGIN_STATUS_ERROR',
+	LOGOUT : 'LOGOUT',
+	SEND_MESSAGE : 'SEND_MESSAGE'
+}
 var $nickName;
 var $message;
 var $chatWindow;
 
 function onMessageReceived(evt) {
-	if (evt.data == COMMAND_STATUS_OK) {
-
-	} else if (evt.data == COMMAND_STATUS_ERROR) {
+	if (evt.data == COMMAND_STATUS.OK.value) {
+		console.info(COMMAND_STATUS.OK.text)
+	} else if (evt.data == COMMAND_STATUS.ERROR.value) {
+		console.error(COMMAND_STATUS.ERROR.text)
 		leaveRoom('some error occured');
 	} else {
 		var msg = JSON.parse(evt.data); // native API
@@ -24,38 +39,49 @@ function processCommand(command) {
 	} else {
 		var commandName = command.command.name;
 		switch (commandName) {
-		case "LOGIN":
-			processLoginCommand(command);
+		case COMMAND.LOGIN_STATUS_OK:
+			processLoginStatusOKCommand(command);
 			break;
-		case "LOGOUT":
+		case COMMAND.LOGIN_STATUS_ERROR:
+			processLoginStatusErrorCommand(command);
+			break;
+		case COMMAND.LOGOUT:
 			processLogoutCommand(command)
 			break;
-		case "SEND_MESSAGE":
+		case COMMAND.SEND_MESSAGE:
 			processSendMessageCommand(command);
 			break;
 		default:
-			break;
+			console.log(command);
 		}
 	}
 }
+function processLoginStatusOKCommand(command) {
+	var $messageLine = generateMessageLine(command.timestamp, command.sender,
+			'User "' + command.argumentValue + '" has logged in.');
+	writeMessage($messageLine);
+}
+function processLoginStatusErrorCommand(command) {
+	var errorMessage = 'Login error occured. You tried to login with username:'
+			+ command.argumentValue;
+	leaveRoom(errorMessage);
+}
 function processLoadHistoryCommand(commands) {
 	var newWindow = window.open();
-	newWindow.document.open();
+	var messageHistory = '<table border="0" cellspacing="5" cellpadding="10"><thead><tr><th>timestamp</th><th>ip</th><th>sender</th><th>command</th><th>value</th></tr></thead><tbody>';
 	commands.forEach(function(command) {
-		var message = generateHistoryMessageLine(command.timestamp,
-				command.sender, command.argumentValue);
-		newWindow.document.write(message);
+		var row = generateHistoryMessageLine(command.command.name,
+				command.timestamp, command.sender, command.argumentValue,
+				command.ipAddr);
+		messageHistory += row;
 	});
+	messageHistory += '</tbody><thead><tr><th>timestamp</th><th>ip</th><th>sender</th><th>command</th><th>value</th></tr></thead></table>';
+	newWindow.document.write(messageHistory);
 	newWindow.document.close();
 }
 function processSendMessageCommand(command) {
 	var $messageLine = generateMessageLine(command.timestamp, command.sender,
 			command.argumentValue);
-	writeMessage($messageLine);
-}
-function processLoginCommand(command) {
-	var $messageLine = generateMessageLine(command.timestamp, command.sender,
-			'User "' + command.argumentValue + '" has logged in.');
 	writeMessage($messageLine);
 }
 function processLogoutCommand(command) {
@@ -67,10 +93,14 @@ function writeMessage(messageLine) {
 	$chatWindow.append(messageLine);
 	$chatWindow.scrollTop($chatWindow.prop('scrollHeight'));
 }
-function generateHistoryMessageLine(timestamp, sender, messageValue) {
-	var $messageLine = timestamp + ' ' + sender + ' : ' + messageValue
-			+ '<br/>';
-	return $messageLine;
+function generateHistoryMessageLine(commandName, timestamp, sender, messageValue,
+		ipAddr) {
+	var messageLine = '<tr><td>' + timestamp + '</td>';
+	messageLine += '<td>' + ipAddr + '</td>';
+	messageLine += '<td>' + sender + '</td>';
+	messageLine += '<td>' + commandName + '</td>';
+	messageLine += '<td>' + messageValue + '</td></tr>';
+	return messageLine;
 }
 function generateMessageLine(timestamp, sender, messageValue) {
 	var timestamp = '<div class="label label-default">' + timestamp + '</div>';

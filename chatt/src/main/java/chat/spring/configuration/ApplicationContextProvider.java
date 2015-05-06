@@ -6,23 +6,21 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class ApplicationContextProvider implements ApplicationContextAware {
-	private static ApplicationContext applicationContext;
+  private static ApplicationContext applicationContext;
 
-	private ApplicationContextProvider() {
-		//
-	}
+  private ApplicationContextProvider() {
+    //
+  }
 
-	public static ApplicationContext getApplicationContext() {
-		if (applicationContext == null)
-			applicationContext = new AnnotationConfigApplicationContext(
-					ApplicationConfig.class);
-		return applicationContext;
-	}
+  public static ApplicationContext getApplicationContext() {
+    if (applicationContext == null)
+      applicationContext = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+    return applicationContext;
+  }
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		ApplicationContextProvider.applicationContext = applicationContext;
-	}
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    ApplicationContextProvider.applicationContext = applicationContext;
+  }
 
 }
