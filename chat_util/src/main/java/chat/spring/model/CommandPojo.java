@@ -20,81 +20,90 @@ import chat.model.Constants;
 @Entity
 @Table(name = "MESSAGE")
 public class CommandPojo {
-	@Id
-	@GeneratedValue
-	@Column(name = "id")
-	private long id;
-	@Column(name = "command")
-	@Enumerated(EnumType.STRING)
-	private Command command;
-	@Column(name = "value")
-	private String argumentValue;
-	@Column(name = "sender")
-	private String sender;
-	@Column(name = "timestamp")
-	private String timestamp;
+  @Id
+  @GeneratedValue
+  @Column(name = "id")
+  private long id;
+  @Column(name = "command")
+  @Enumerated(EnumType.STRING)
+  private Command command;
+  @Column(name = "value")
+  private String argumentValue;
+  @Column(name = "sender")
+  private String sender;
+  @Column(name = "timestamp")
+  private String timestamp;
+  @Column(name = "ip_addr")
+  private String ipAddr;
 
-	public CommandPojo() {
-		timestamp = DateTime.now().toString(Constants.DATE_TIME_FORMATTER);
-	}
+  public CommandPojo() {
+    timestamp = DateTime.now().toString(Constants.DATE_TIME_FORMATTER);
+  }
 
-	public CommandPojo(CommandPojo commandPojo) {
-		this.command = commandPojo.getCommand();
-		this.argumentValue = commandPojo.getArgumentValue();
-		this.sender = commandPojo.getSender();
-		this.timestamp = commandPojo.getTimestamp();
-	}
+  public CommandPojo(CommandPojo commandPojo) {
+    this.command = commandPojo.getCommand();
+    this.argumentValue = commandPojo.getArgumentValue();
+    this.sender = commandPojo.getSender();
+    this.timestamp = commandPojo.getTimestamp();
+  }
 
-	public String getTimestamp() {
-		return timestamp;
-	}
+  public String getTimestamp() {
+    return timestamp;
+  }
 
-	public Command getCommand() {
-		return command;
-	}
+  public Command getCommand() {
+    return command;
+  }
 
-	public void setCommand(Command command) {
-		this.command = command;
-	}
+  public void setCommand(Command command) {
+    this.command = command;
+  }
 
-	public String getArgumentValue() {
-		return argumentValue;
-	}
+  public String getArgumentValue() {
+    return argumentValue;
+  }
 
-	public void setArgumentValue(String argumentValue) {
-		this.argumentValue = argumentValue;
-	}
+  public void setArgumentValue(String argumentValue) {
+    this.argumentValue = argumentValue;
+  }
 
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this, true);
-	}
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this, true);
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj, true);
-	}
+  @Override
+  public boolean equals(Object obj) {
+    return EqualsBuilder.reflectionEquals(this, obj, true);
+  }
 
-	@Override
-	public String toString() {
-		return ReflectionToStringBuilder.toString(this,
-				ToStringStyle.SHORT_PREFIX_STYLE);
-	}
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+  }
 
-	public String getSender() {
-		return sender;
-	}
+  public String getSender() {
+    return sender;
+  }
 
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
+  public void setSender(String sender) {
+    this.sender = sender;
+  }
 
-	public long getId() {
-		return id;
-	}
+  public long getId() {
+    return id;
+  }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public String getIpAddr() {
+    return ipAddr;
+  }
+
+  public void setIpAddr(String ipAddr) {
+    this.ipAddr = ipAddr;
+  }
 
 }
