@@ -6,8 +6,12 @@ Project for university cource "Secure client application programming"
 Technologies:
 * JavaEE7
 * Glassfish WebSockets
-* JS - jQuery
 * Spring 4
 * Hibernate 4
 * maven
 * jUnit
+
+* JS - jQuery
+
+* python 2.7
+* Django 1.8
